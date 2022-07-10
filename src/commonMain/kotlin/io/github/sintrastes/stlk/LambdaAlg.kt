@@ -35,8 +35,11 @@ interface LambdaAlg<F> {
     }
 
     companion object {
-        /** Deserialize a value from a RawExpr for the [LambdaAlg] DSL. */
-        inline fun <reified A> deserialize(raw: RawExpr): A? {
+        /**
+         * Deserializer for deserializing a value from a RawExpr for the [LambdaAlg] DSL
+         * using open recursion to that deserializers for other algebras can be built
+         * on top of this one. */
+        inline fun <reified A> deserialize(raw: RawExpr, rec: (RawExpr) -> A? = { null }): A? {
             return when (raw) {
                 is RawExpr.App -> TODO()
                 is RawExpr.AppOp -> TODO()
