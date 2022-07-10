@@ -49,7 +49,11 @@ kotlin {
             }
         }
         val jvmMain by getting
-        val jvmTest by getting
+        val jvmTest by getting {
+            dependencies {
+                implementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
+            }
+        }
         val jsMain by getting
         val jsTest by getting
         val nativeMain by getting

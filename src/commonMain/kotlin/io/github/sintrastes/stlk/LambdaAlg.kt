@@ -30,13 +30,3 @@ interface LambdaAlg<F> {
         )
     }
 }
-
-fun <F> ArithAlg<F>.example(): Apply<F, (Int) -> Int> {
-    return func { x ->
-        x * int(5) + int(6)
-    }
-}
-
-val test = ArithAlg.Interpreter
-    .example()
-    .fix()
