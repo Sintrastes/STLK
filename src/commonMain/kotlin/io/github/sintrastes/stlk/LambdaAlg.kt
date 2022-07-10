@@ -1,5 +1,6 @@
 package io.github.sintrastes.stlk
 
+import kotlin.reflect.KClass
 
 /**
  * The base object algebra for STLK. Provides the simply-typed lambda calculus
@@ -39,14 +40,38 @@ interface LambdaAlg<F> {
          * Deserializer for deserializing a value from a RawExpr for the [LambdaAlg] DSL
          * using open recursion to that deserializers for other algebras can be built
          * on top of this one. */
-        inline fun <reified A> deserialize(raw: RawExpr, rec: (RawExpr) -> A? = { null }): A? {
+        fun <A : Any> deserialize(clazz: KClass<A>, raw: RawExpr, rec: ExprDeserializer = ExprDeserializer.Empty): A? {
             return when (raw) {
-                is RawExpr.App -> TODO()
-                is RawExpr.AppOp -> TODO()
-                is RawExpr.Const -> TODO()
-                is RawExpr.Var -> TODO()
-                is RawExpr.CustomOp -> TODO()
+                is RawExpr.App -> {
+                    rec.deserialize(clazz, raw.f)?.let { f ->
+                        rec.deserialize(clazz, raw.x)?.let { x ->
+                            TODO()
+                        }
+                    }
+                }
+                is RawExpr.AppOp -> {
+                    rec.deserialize(clazz, raw)
+                }
+                is RawExpr.Const -> {
+                    rec.deserialize(clazz, raw)
+                }
+                is RawExpr.Var -> {
+                    rec.deserialize(clazz, raw)
+                }
+                is RawExpr.CustomOp -> {
+                    rec.deserialize(clazz, raw)
+                }
             }
+        }
+    }
+}
+
+interface ExprDeserializer {
+    fun <A : Any> deserialize(clazz: KClass<A>, raw: RawExpr): A?
+
+    object Empty: ExprDeserializer {
+        override fun <A : Any> deserialize(clazz: KClass<A>, raw: RawExpr): A? {
+            return null
         }
     }
 }
