@@ -43,7 +43,7 @@ interface ConsoleAlg<F>: LambdaAlg<F> {
             TODO("Not yet implemented")
         }
 
-        override fun <X, Y> func(x: String, expr: (Apply<IdOf, X>) -> Apply<IdOf, Y>): Apply<IdOf, (X) -> Y> {
+        override fun <X, Y> func(xexpr: (Apply<IdOf, X>) -> Apply<IdOf, Y>): Apply<IdOf, (X) -> Y> {
             TODO("Not yet implemented")
         }
 

@@ -28,7 +28,7 @@ interface ListOpsAlg<F> {
             f: (Apply<ConstOf<RawExpr>, A>) -> Apply<ConstOf<RawExpr>, B>
         ): Apply<ConstOf<RawExpr>, List<B>> = Const(
             RawExpr.AppOp(
-                RawExpr.Var("map"),
+                RawExpr.CustomOp("map"),
                 listOf(f(Const(RawExpr.Var("x${Random.nextBytes(5)}"))).fix())
             )
         )
@@ -38,7 +38,7 @@ interface ListOpsAlg<F> {
             f: (Apply<ConstOf<RawExpr>, B>, Apply<ConstOf<RawExpr>, A>) -> Apply<ConstOf<RawExpr>, B>
         ): Apply<ConstOf<RawExpr>, B> = Const(
             RawExpr.AppOp(
-                RawExpr.Var("fold"),
+                RawExpr.CustomOp("fold"),
                 listOf(
                     initial.fix(),
                     f(
