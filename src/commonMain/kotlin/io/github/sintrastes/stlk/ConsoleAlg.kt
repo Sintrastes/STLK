@@ -3,7 +3,7 @@ package io.github.sintrastes.stlk
 import kotlin.native.concurrent.ThreadLocal
 
 /** An object algebra for describing console I/O. */
-interface ConsoleAlg<F>: LambdaAlg<F> {
+interface ConsoleAlg<F> : LambdaAlg<F> {
     fun readLn(): Apply<F, String>
     fun printLn(text: Apply<F, String>): Apply<F, Unit>
 
@@ -12,7 +12,7 @@ interface ConsoleAlg<F>: LambdaAlg<F> {
     // To get this to work, we probably also need to keep track of "unused" results.
     // and then it will all need to be post-processed to convert everything into
     // "monadic" (i.e. expression-based) form.
-    object Serializer: LambdaAlg<ConstOf<RawExpr>> by LambdaAlg.Serializer, ConsoleAlg<ConstOf<RawExpr>> {
+    object Serializer : LambdaAlg<ConstOf<RawExpr>> by LambdaAlg.Serializer, ConsoleAlg<ConstOf<RawExpr>> {
         // Counter to keep track of separate function invocations.
         private var invocation: Int = 0
 

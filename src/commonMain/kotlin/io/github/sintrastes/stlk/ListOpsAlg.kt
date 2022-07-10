@@ -4,7 +4,7 @@ import kotlin.random.Random
 
 interface ListOpsAlg<F> {
     fun <A, B> Apply<F, List<A>>.map(f: (Apply<F, A>) -> Apply<F, B>): Apply<F, List<B>>
-    fun <A, B> Apply<F, List<A>>.fold(initial: Apply<F, B>, f: (Apply<F,B>, Apply<F, A>) -> Apply<F,B>): Apply<F, B>
+    fun <A, B> Apply<F, List<A>>.fold(initial: Apply<F, B>, f: (Apply<F, B>, Apply<F, A>) -> Apply<F, B>): Apply<F, B>
 
     object Interpreter : ListOpsAlg<IdOf> {
         override fun <A, B> Apply<IdOf, List<A>>.map(

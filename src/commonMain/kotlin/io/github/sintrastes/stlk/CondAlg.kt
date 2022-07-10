@@ -61,18 +61,20 @@ interface CondAlg<F> {
             )
         )
 
-        override fun Apply<ConstOf<RawExpr>, Boolean>.and(other: Apply<ConstOf<RawExpr>, Boolean>): Apply<ConstOf<RawExpr>, Boolean> = Const(
-            RawExpr.AppOp(
-                RawExpr.CustomOp("and"),
-                listOf(fix(), other.fix())
+        override fun Apply<ConstOf<RawExpr>, Boolean>.and(other: Apply<ConstOf<RawExpr>, Boolean>): Apply<ConstOf<RawExpr>, Boolean> =
+            Const(
+                RawExpr.AppOp(
+                    RawExpr.CustomOp("and"),
+                    listOf(fix(), other.fix())
+                )
             )
-        )
 
-        override fun Apply<ConstOf<RawExpr>, Boolean>.or(other: Apply<ConstOf<RawExpr>, Boolean>): Apply<ConstOf<RawExpr>, Boolean> = Const(
-            RawExpr.AppOp(
-                RawExpr.CustomOp("or"),
-                listOf(fix(), other.fix())
+        override fun Apply<ConstOf<RawExpr>, Boolean>.or(other: Apply<ConstOf<RawExpr>, Boolean>): Apply<ConstOf<RawExpr>, Boolean> =
+            Const(
+                RawExpr.AppOp(
+                    RawExpr.CustomOp("or"),
+                    listOf(fix(), other.fix())
+                )
             )
-        )
     }
 }
