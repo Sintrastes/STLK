@@ -2,22 +2,6 @@ package io.github.sintrastes.stlk
 
 import kotlin.jvm.JvmName
 
-interface Apply<F, A>
-
-object IdOf
-data class Id<A>(val underlying: A): Apply<IdOf, A>
-@JvmName("fixId")
-fun <A> Apply<IdOf, A>.fix(): A {
-    return (this as Id<A>).underlying
-}
-
-class ConstOf<A>
-data class Const<A, X>(val underlying: A): Apply<ConstOf<A>, X>
-@JvmName("fixConst")
-fun <A, X> Apply<ConstOf<A>, X>.fix(): A {
-    return (this as Const<A,X>).underlying
-}
-
 interface LambdaAlg<F> {
     fun <X, Y> func(expr: (Apply<F, X>) -> Apply<F, Y>): Apply<F, (X) -> Y>
     operator fun <X,Y> Apply<F, (X) -> Y>.invoke(x: Apply<F, X>): Apply<F, Y>
