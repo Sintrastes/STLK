@@ -1,7 +1,5 @@
 package io.github.sintrastes.stlk
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmName
 
 interface Apply<F, A>
@@ -21,23 +19,22 @@ fun <A, X> Apply<ConstOf<A>, X>.fix(): A {
 }
 
 interface LambdaAlg<F> {
-    fun <X, Y> func(x: String, expr: (Apply<F, X>) -> Apply<F, Y>): Apply<F, (X) -> Y>
+    fun <X, Y> func(expr: (Apply<F, X>) -> Apply<F, Y>): Apply<F, (X) -> Y>
     operator fun <X,Y> Apply<F, (X) -> Y>.invoke(x: Apply<F, X>): Apply<F, Y>
 
     object Interpreter: LambdaAlg<IdOf> {
         override fun <X, Y> Apply<IdOf, (X) -> Y>.invoke(x: Apply<IdOf, X>)
                 = Id(fix()(x.fix()))
 
-        override fun <X, Y> func(x: String, expr: (Apply<IdOf, X>) -> Apply<IdOf, Y>): Apply<IdOf, (X) -> Y>
+        override fun <X, Y> func(expr: (Apply<IdOf, X>) -> Apply<IdOf, Y>): Apply<IdOf, (X) -> Y>
                 = Id { expr(Id(it)).fix() }
     }
 
-    object Serializer: LambdaAlg<ConstOf<RawExpr>> {
+    object Serializer: LambdaAlg<ConstOf<RawExpr>>, GenSym by GenSym.default {
         override fun <X, Y> func(
-            x: String,
             expr: (Apply<ConstOf<RawExpr>, X>) -> Apply<ConstOf<RawExpr>, Y>
         ): Apply<ConstOf<RawExpr>, (X) -> Y> = Const(
-            expr(Const(RawExpr.Var(x)))
+            expr(Const(RawExpr.Var(genSym("x"))))
                 .fix()
         )
 
@@ -51,7 +48,7 @@ interface LambdaAlg<F> {
 }
 
 fun <F> ArithAlg<F>.example(): Apply<F, (Int) -> Int> {
-    return func("x") { x ->
+    return func { x ->
         x * int(5) + int(6)
     }
 }
