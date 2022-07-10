@@ -23,26 +23,8 @@ fun <A, X> Apply<ConstOf<A>, X>.fix(): A {
 interface LambdaAlg<F> {
     fun <X, Y> func(x: String, expr: (Apply<F, X>) -> Apply<F, Y>): Apply<F, (X) -> Y>
     operator fun <X,Y> Apply<F, (X) -> Y>.invoke(x: Apply<F, X>): Apply<F, Y>
-}
 
-interface ArithAlg<F>: LambdaAlg<F> {
-    fun int(x: Int): Apply<F, Int>
-    operator fun Apply<F, Int>.plus(other: Apply<F, Int>): Apply<F, Int>
-    operator fun Apply<F, Int>.times(other: Apply<F, Int>): Apply<F, Int>
-    operator fun Apply<F, Int>.minus(other: Apply<F, Int>): Apply<F, Int>
-
-    object Interpreter: ArithAlg<IdOf> {
-        override fun int(x: Int): Apply<IdOf, Int> = Id(x)
-
-        override fun Apply<IdOf, Int>.minus(other: Apply<IdOf, Int>)
-                = Id(fix() - other.fix())
-
-        override fun Apply<IdOf, Int>.times(other: Apply<IdOf, Int>)
-                = Id(fix() * other.fix())
-
-        override fun Apply<IdOf, Int>.plus(other: Apply<IdOf, Int>)
-                = Id(fix() + other.fix())
-
+    object Interpreter: LambdaAlg<IdOf> {
         override fun <X, Y> Apply<IdOf, (X) -> Y>.invoke(x: Apply<IdOf, X>)
                 = Id(fix()(x.fix()))
 
@@ -50,7 +32,7 @@ interface ArithAlg<F>: LambdaAlg<F> {
                 = Id { expr(Id(it)).fix() }
     }
 
-    object Serializer: ArithAlg<ConstOf<RawExpr>> {
+    object Serializer: LambdaAlg<ConstOf<RawExpr>> {
         override fun <X, Y> func(
             x: String,
             expr: (Apply<ConstOf<RawExpr>, X>) -> Apply<ConstOf<RawExpr>, Y>
@@ -65,7 +47,29 @@ interface ArithAlg<F>: LambdaAlg<F> {
                 x.fix()
             )
         )
+    }
+}
 
+interface ArithAlg<F>: LambdaAlg<F> {
+    fun int(x: Int): Apply<F, Int>
+    operator fun Apply<F, Int>.plus(other: Apply<F, Int>): Apply<F, Int>
+    operator fun Apply<F, Int>.times(other: Apply<F, Int>): Apply<F, Int>
+    operator fun Apply<F, Int>.minus(other: Apply<F, Int>): Apply<F, Int>
+
+    object Interpreter: LambdaAlg<IdOf> by LambdaAlg.Interpreter, ArithAlg<IdOf> {
+        override fun int(x: Int): Apply<IdOf, Int> = Id(x)
+
+        override fun Apply<IdOf, Int>.minus(other: Apply<IdOf, Int>)
+                = Id(fix() - other.fix())
+
+        override fun Apply<IdOf, Int>.times(other: Apply<IdOf, Int>)
+                = Id(fix() * other.fix())
+
+        override fun Apply<IdOf, Int>.plus(other: Apply<IdOf, Int>)
+                = Id(fix() + other.fix())
+    }
+
+    object Serializer: LambdaAlg<ConstOf<RawExpr>> by LambdaAlg.Serializer, ArithAlg<ConstOf<RawExpr>> {
         override fun int(x: Int): Apply<ConstOf<RawExpr>, Int> = Const(
             RawExpr.Const(x)
         )
