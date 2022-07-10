@@ -1,7 +1,11 @@
 package io.github.sintrastes.stlk
 
-import kotlin.jvm.JvmName
 
+/**
+ * The base object algebra for STLK. Provides the simply-typed lambda calculus
+ *  operations of lambda abstraction (given by [func]), and application (by
+ *  Kotlin's overloaded function application operator -- [invoke]).
+ */
 interface LambdaAlg<F> {
     fun <X, Y> func(expr: (Apply<F, X>) -> Apply<F, Y>): Apply<F, (X) -> Y>
     operator fun <X,Y> Apply<F, (X) -> Y>.invoke(x: Apply<F, X>): Apply<F, Y>
