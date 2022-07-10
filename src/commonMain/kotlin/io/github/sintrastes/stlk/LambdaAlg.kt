@@ -66,6 +66,10 @@ interface LambdaAlg<F> {
     }
 }
 
+/**
+ * Interface for a function that can deserialize a raw expression into
+ *  a specified class.
+ */
 interface ExprDeserializer {
     fun <A : Any> deserialize(clazz: KClass<A>, raw: RawExpr): A?
 

@@ -1,6 +1,7 @@
 plugins {
-    kotlin("multiplatform") version "1.7.10"
-    kotlin("plugin.serialization") version "1.7.10"
+    kotlin("multiplatform") version "1.6.21"
+    kotlin("plugin.serialization") version "1.6.21"
+    id("io.kotest.multiplatform") version "5.3.2"
 }
 
 group = "io.github.sintrastes"
@@ -20,7 +21,7 @@ kotlin {
             useJUnitPlatform()
         }
     }
-    js(BOTH) {
+    js(IR) {
         browser {
             commonWebpackConfig {
                 cssSupport.enabled = true
@@ -47,14 +48,12 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation("io.kotest:kotest-framework-engine:5.3.2")
             }
         }
+
         val jvmMain by getting
-        val jvmTest by getting {
-            dependencies {
-                implementation("io.kotest:kotest-runner-junit5-jvm:4.6.0")
-            }
-        }
+        val jvmTest by getting
         val jsMain by getting
         val jsTest by getting
         val nativeMain by getting
