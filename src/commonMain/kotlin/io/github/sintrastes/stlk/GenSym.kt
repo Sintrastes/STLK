@@ -14,7 +14,9 @@ interface GenSym {
             val latestSymbol = mutableMapOf<String, Int>()
 
             override fun genSym(prefix: String): String {
-                TODO("Not yet implemented")
+                val count = latestSymbol[prefix] ?: 0
+                latestSymbol[prefix] = count + 1
+                return "$prefix$count"
             }
         }
     }
