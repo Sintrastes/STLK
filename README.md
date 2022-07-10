@@ -20,7 +20,7 @@ Ever wish you could serialize mathematical functions like `{ x -> x * 2 + 3 }` w
 
 ```kotlin
 fun <F> AirthAlg<F>.someFunction(): Apply<F, (Int) -> Int> =
-    func("x") { x -> x + 42 }
+    func { x -> x + 42 }
     
 Json.encodeToString (
     ArithAlg.Serializer.someFunction()
