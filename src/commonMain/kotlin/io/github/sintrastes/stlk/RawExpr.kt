@@ -34,7 +34,7 @@ sealed class RawExpr {
      *  function or operator.
      */
     @Serializable
-    data class CustomOp(val identifier: String)
+    data class CustomOp(val identifier: String): RawExpr()
 
     /**
      * Representation of a literal expression. Must have a registered

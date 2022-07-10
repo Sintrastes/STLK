@@ -33,4 +33,17 @@ interface LambdaAlg<F> {
             )
         )
     }
+
+    companion object {
+        /** Deserialize a value from a RawExpr for the [LambdaAlg] DSL. */
+        inline fun <reified A> deserialize(raw: RawExpr): A? {
+            return when (raw) {
+                is RawExpr.App -> TODO()
+                is RawExpr.AppOp -> TODO()
+                is RawExpr.Const -> TODO()
+                is RawExpr.Var -> TODO()
+                is RawExpr.CustomOp -> TODO()
+            }
+        }
+    }
 }
