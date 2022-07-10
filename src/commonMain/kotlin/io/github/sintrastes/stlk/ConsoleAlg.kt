@@ -10,6 +10,8 @@ interface ConsoleAlg<F>: LambdaAlg<F> {
     // Note: In order to simulate a "free-monad"-type interpreter,
     // here we use a naming scheme for results, counting the number of invocations.
     // To get this to work, we probably also need to keep track of "unused" results.
+    // and then it will all need to be post-processed to convert everything into
+    // "monadic" (i.e. expression-based) form.
     object Serializer: LambdaAlg<ConstOf<RawExpr>> by LambdaAlg.Serializer, ConsoleAlg<ConstOf<RawExpr>> {
         // Counter to keep track of separate function invocations.
         private var invocation: Int = 0
@@ -29,6 +31,24 @@ interface ConsoleAlg<F>: LambdaAlg<F> {
                     listOf(text.fix())
                 )
             )
+        }
+    }
+
+    object Interpreter : ConsoleAlg<IdOf> {
+        override fun readLn(): Apply<IdOf, String> {
+            TODO("Not yet implemented")
+        }
+
+        override fun <X, Y> Apply<IdOf, (X) -> Y>.invoke(x: Apply<IdOf, X>): Apply<IdOf, Y> {
+            TODO("Not yet implemented")
+        }
+
+        override fun <X, Y> func(x: String, expr: (Apply<IdOf, X>) -> Apply<IdOf, Y>): Apply<IdOf, (X) -> Y> {
+            TODO("Not yet implemented")
+        }
+
+        override fun printLn(text: Apply<IdOf, String>): Apply<IdOf, Unit> {
+            TODO("Not yet implemented")
         }
     }
 }
