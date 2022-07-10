@@ -27,7 +27,7 @@ interface ConsoleAlg<F>: LambdaAlg<F> {
         override fun printLn(text: Apply<ConstOf<RawExpr>, String>): Apply<ConstOf<RawExpr>, Unit> {
             return Const(
                 RawExpr.AppOp(
-                    RawExpr.Var("printLn"),
+                    RawExpr.CustomOp("printLn"),
                     listOf(text.fix())
                 )
             )
