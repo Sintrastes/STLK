@@ -1,5 +1,7 @@
 package io.github.sintrastes.stlk
 
+import kotlin.reflect.KType
+
 /** Object algebra for arithmetic operations on integers. */
 interface IntArithAlg<F> : LambdaAlg<F> {
     fun int(x: Int): Apply<F, Int>
@@ -45,5 +47,28 @@ interface IntArithAlg<F> : LambdaAlg<F> {
                     listOf(fix(), other.fix())
                 )
             )
+    }
+
+    object Deserializer : ExprDeserializer {
+        override fun <A : Any> deserialize(type: KType, raw: RawExpr): A? {
+            return when (raw) {
+                is RawExpr.App -> null
+                is RawExpr.AppOp -> null
+                is RawExpr.Const -> when (raw.value) {
+                    is Int -> {
+                        raw.value as? A
+                    }
+                    else -> null
+                }
+                is RawExpr.CustomOp -> when (raw.identifier) {
+                    "minus" -> ({ x: Int, y: Int -> x - y }) as? A
+                    "plus"  -> ({ x: Int, y: Int -> x + y }) as? A
+                    "times" -> ({ x: Int, y: Int -> x * y }) as? A
+                    else -> null
+                }
+                is RawExpr.Lam -> null
+                is RawExpr.Var -> null
+            }
+        }
     }
 }
