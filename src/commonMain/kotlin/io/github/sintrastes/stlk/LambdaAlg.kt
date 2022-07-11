@@ -73,8 +73,8 @@ interface LambdaAlg<F> {
                                 inType: KType,
                                 outType: KType
                             ): A? {
-                                return rec.deserialize<(X) -> Y>(type, raw.f)?.let { f ->
-                                    rec.deserialize<X>(inType, raw.x)?.let { x ->
+                                return rec.deserialize<(X) -> Y>(type, raw.f, rec)?.let { f ->
+                                    rec.deserialize<X>(inType, raw.x, rec)?.let { x ->
                                         f(x) as A
                                     }
                                 }
@@ -84,19 +84,19 @@ interface LambdaAlg<F> {
                     )
                 }
                 is RawExpr.Lam -> {
-                    rec.deserialize(type, raw.body)
+                    rec.deserialize(type, raw.body, rec)
                 }
                 is RawExpr.AppOp -> {
-                    rec.deserialize(type, raw)
+                    rec.deserialize(type, raw, rec)
                 }
                 is RawExpr.Const -> {
-                    rec.deserialize(type, raw)
+                    rec.deserialize(type, raw, rec)
                 }
                 is RawExpr.Var -> {
-                    rec.deserialize(type, raw)
+                    rec.deserialize(type, raw, rec)
                 }
                 is RawExpr.CustomOp -> {
-                    rec.deserialize(type, raw)
+                    rec.deserialize(type, raw, rec)
                 }
             }
         }
@@ -113,10 +113,10 @@ interface ExprDeserializer {
      *
      * Assumption: [A] must be the same type as [type].
      */
-    fun <A : Any> deserialize(type: KType, raw: RawExpr): A?
+    fun <A : Any> deserialize(type: KType, raw: RawExpr, rec: ExprDeserializer): A?
 
     object Empty : ExprDeserializer {
-        override fun <A : Any> deserialize(type: KType, raw: RawExpr): A? {
+        override fun <A : Any> deserialize(type: KType, raw: RawExpr, rec: ExprDeserializer): A? {
             return null
         }
     }

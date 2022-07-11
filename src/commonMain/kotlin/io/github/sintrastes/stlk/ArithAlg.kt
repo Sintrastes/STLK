@@ -50,7 +50,7 @@ interface IntArithAlg<F> : LambdaAlg<F> {
     }
 
     object Deserializer : ExprDeserializer {
-        override fun <A : Any> deserialize(type: KType, raw: RawExpr): A? {
+        override fun <A : Any> deserialize(type: KType, raw: RawExpr, rec: ExprDeserializer): A? {
             return when (raw) {
                 is RawExpr.App -> null
                 is RawExpr.AppOp -> null
