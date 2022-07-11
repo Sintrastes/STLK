@@ -9,6 +9,10 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 sealed class RawExpr {
+    /** Representation of a lambda abstraction. */
+    @Serializable
+    data class Lam(val label: String, val body: RawExpr): RawExpr()
+
     /**
      * [RawExpr] of a bound variable (from a lambda expression).
      */
