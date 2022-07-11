@@ -23,10 +23,17 @@ interface LambdaAlg<F> {
     object Serializer : LambdaAlg<ConstOf<RawExpr>>, GenSym by GenSym.default {
         override fun <X, Y> func(
             expr: (Apply<ConstOf<RawExpr>, X>) -> Apply<ConstOf<RawExpr>, Y>
-        ): Apply<ConstOf<RawExpr>, (X) -> Y> = Const(
-            expr(Const(RawExpr.Var(genSym("x"))))
-                .fix()
-        )
+        ): Apply<ConstOf<RawExpr>, (X) -> Y> {
+            val sym = genSym("x")
+
+            return Const(
+                RawExpr.Lam(
+                    sym,
+                    expr(Const(RawExpr.Var(sym)))
+                        .fix()
+                )
+            )
+        }
 
         override fun <X, Y> Apply<ConstOf<RawExpr>, (X) -> Y>.invoke(x: Apply<ConstOf<RawExpr>, X>): Apply<ConstOf<RawExpr>, Y> =
             Const(
@@ -75,6 +82,9 @@ interface LambdaAlg<F> {
                         },
                         onMiss = null
                     )
+                }
+                is RawExpr.Lam -> {
+                    rec.deserialize(type, raw.body)
                 }
                 is RawExpr.AppOp -> {
                     rec.deserialize(type, raw)
