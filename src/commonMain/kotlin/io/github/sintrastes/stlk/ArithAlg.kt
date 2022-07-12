@@ -1,6 +1,6 @@
 package io.github.sintrastes.stlk
 
-import kotlin.reflect.KType
+import kotlin.reflect.*
 
 /** Object algebra for arithmetic operations on integers. */
 interface IntArithAlg<F> : LambdaAlg<F> {
@@ -60,10 +60,21 @@ interface IntArithAlg<F> : LambdaAlg<F> {
                 }
                 is RawExpr.CustomOp -> when (raw.identifier) {
                     "minus" -> ({ x: Int, y: Int -> x - y }) as? A
-                    "plus"  -> ({ x: Int, y: Int -> x + y }) as? A
+                    "plus" -> ({ x: Int, y: Int -> x + y }) as? A
                     "times" -> ({ x: Int, y: Int -> x * y }) as? A
                     else -> null
                 }
+                else -> null
+            }
+        }
+    }
+
+    companion object {
+        val TypeResolver: (String) -> KType? = { ident ->
+            when (ident) {
+                "minus" -> typeOf<(Int, Int) -> Int>()
+                "plus"  -> typeOf<(Int, Int) -> Int>()
+                "times" -> typeOf<(Int, Int) -> Int>()
                 else -> null
             }
         }
