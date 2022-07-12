@@ -102,10 +102,10 @@ interface LambdaAlg<F> {
                                 inType: KType,
                                 outType: KType
                             ): A? {
-                                return deserializeLambdaBody<Y, X>(type, raw.body, rec, raw.label)
-                                    ?.let { body ->
-                                        { x: X -> body(x) } as A
-                                    }
+                                return { x: X ->
+                                    deserializeLambdaBody<Y, X>(type, raw.body, rec, raw.label, x)
+                                        ?: throw IllegalArgumentException("Could not parse argument of type $type")
+                                } as A
                             }
                         },
                         onMiss = null
@@ -133,10 +133,14 @@ interface LambdaAlg<F> {
             type: KType,
             raw: RawExpr,
             rec: ExprDeserializer = ExprDeserializer.Empty,
-            varLabel: String
-        ): ((X) -> A)? = { x ->
-            TODO()
-        }
+            varLabel: String,
+            value: X
+        ): A? = deserialize(type, raw, rec)
+            ?: when {
+                raw is RawExpr.Var && raw.label == varLabel ->
+                    value as A
+                else -> null
+            }
     }
 }
 

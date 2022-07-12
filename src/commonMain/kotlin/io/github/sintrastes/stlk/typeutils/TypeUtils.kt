@@ -9,7 +9,7 @@ fun <R> KType.patternMatchFunType(
     onMiss: R
 ): R {
     val clazz = (this.classifier as? KClass<*>)
-    val isFun = clazz is Function1<*, *>
+    val isFun = clazz!! == Function1::class
 
     return if (isFun) {
         val args = this.arguments
