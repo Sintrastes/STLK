@@ -31,9 +31,12 @@ class LambdaAlgTest : FunSpec({
         val raw = IntArithAlg.Serializer.example()
             .fix()
 
-        println("Serialized: ${raw}")
+        println("Serialized: $raw")
 
-        val example = LambdaAlg.deserialize<(Int) -> Int>(raw, IntArithAlg.Deserializer)!!
+        val example = LambdaAlg.deserialize<(Int) -> Int>(
+            raw,
+            IntArithAlg.Deserializer
+        )!!
 
         println("$example")
 
