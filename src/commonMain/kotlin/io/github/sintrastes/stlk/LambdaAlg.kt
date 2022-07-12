@@ -113,6 +113,15 @@ interface LambdaAlg<F> {
                 }
             }
         }
+
+        private fun <A : Any> deserializeLambda(
+            type: KType,
+            raw: RawExpr,
+            rec: ExprDeserializer = ExprDeserializer.Empty,
+            varLabel: String
+        ): A? {
+            TODO()
+        }
     }
 }
 
