@@ -49,9 +49,13 @@ interface LambdaAlg<F> {
          * Deserializer for deserializing a value from a RawExpr for the [LambdaAlg] DSL
          * using open recursion to that deserializers for other algebras can be built
          * on top of this one. */
-        inline fun <reified A : Any> deserialize(raw: RawExpr, rec: ExprDeserializer = ExprDeserializer.Empty): A? {
+        inline fun <reified A : Any> deserialize(
+            raw: RawExpr,
+            atomDeserializer: ExprDeserializer = ExprDeserializer.Empty,
+            noinline resolveType: (String) -> KType?
+        ): A? {
             val type = typeOf<A>()
-            return deserialize(type, raw, rec)
+            return deserialize(type, raw, atomDeserializer, resolveType)
         }
 
         /**
@@ -104,7 +108,14 @@ interface LambdaAlg<F> {
                                 outType: KType
                             ): A? {
                                 return { x: X ->
-                                    deserializeLambdaBody<Y, X>(type, raw.body, atomDeserializer, raw.label, x)
+                                    deserializeLambdaBody<Y, X>(
+                                        type,
+                                        raw.body,
+                                        atomDeserializer,
+                                        resolveType,
+                                        raw.label,
+                                        x
+                                    )
                                         ?: throw IllegalArgumentException("Could not parse argument of type $type")
                                 } as A
                             }
@@ -116,7 +127,7 @@ interface LambdaAlg<F> {
                     println("AppOp")
                     resolveType(raw.f.identifier)?.let { type ->
                         type.patternMatchFunType(
-                            onMatch = object: FunMatcher<A?> {
+                            onMatch = object : FunMatcher<A?> {
                                 override fun <X : Any, Y : Any> match(
                                     inClass: KClass<X>,
                                     outClass: KClass<Y>,
@@ -150,10 +161,11 @@ interface LambdaAlg<F> {
         private fun <A : Any, X> deserializeLambdaBody(
             type: KType,
             raw: RawExpr,
-            rec: ExprDeserializer = ExprDeserializer.Empty,
+            atomDeserializer: ExprDeserializer = ExprDeserializer.Empty,
+            resolveType: (String) -> KType?,
             varLabel: String,
             value: X
-        ): A? = deserialize(type, raw, rec)
+        ): A? = deserialize(type, raw, atomDeserializer, resolveType)
             ?: when {
                 raw is RawExpr.Var && raw.label == varLabel ->
                     value as A
