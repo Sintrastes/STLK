@@ -65,7 +65,8 @@ interface LambdaAlg<F> {
         fun <A : Any> deserialize(
             type: KType,
             raw: RawExpr,
-            atomDeserializer: ExprDeserializer = ExprDeserializer.Empty
+            atomDeserializer: ExprDeserializer = ExprDeserializer.Empty,
+            typeResolver: (String) -> KType?
         ): A? {
             return when (raw) {
                 is RawExpr.App -> {
