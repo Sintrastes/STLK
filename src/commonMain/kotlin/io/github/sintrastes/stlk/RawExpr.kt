@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 sealed class RawExpr {
+
     /** Representation of a lambda abstraction. */
     @Serializable
     data class Lam(val label: String, val body: RawExpr): RawExpr()
@@ -46,4 +47,15 @@ sealed class RawExpr {
      */
     @Serializable
     data class Const(val value: @Contextual Any) : RawExpr()
+}
+
+fun RawExpr.containsVar(label: String, notIn: List<String> = listOf()): Boolean = when (this) {
+    is RawExpr.Var -> this.label == label
+    is RawExpr.App -> this.f.containsVar(label, notIn) ||
+            this.x.containsVar(label, notIn)
+    is RawExpr.AppOp -> this.f.containsVar(label, notIn) ||
+            this.args.any { it.containsVar(label, notIn) }
+    is RawExpr.Lam -> this.body
+        .containsVar(label, notIn + this.label)
+    else -> false
 }

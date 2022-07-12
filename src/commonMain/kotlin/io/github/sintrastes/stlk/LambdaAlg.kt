@@ -134,7 +134,7 @@ interface LambdaAlg<F> {
             raw: RawExpr,
             rec: ExprDeserializer = ExprDeserializer.Empty,
             varLabel: String
-        ): ((X) -> A)? {
+        ): ((X) -> A)? = { x ->
             TODO()
         }
     }
