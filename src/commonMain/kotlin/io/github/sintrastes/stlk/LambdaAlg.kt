@@ -113,7 +113,11 @@ interface LambdaAlg<F> {
                 }
                 is RawExpr.AppOp -> {
                     println("AppOp")
-                    deserialize(type, raw, rec)
+                    // TODO: Match on type of function,
+                    //  parse function and arguments,
+                    //  apply function to argument if
+                    //  both parse successfully
+                    null
                 }
                 is RawExpr.Const -> {
                     rec.deserialize(type, raw, rec)
