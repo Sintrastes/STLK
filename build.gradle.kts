@@ -36,7 +36,6 @@ kotlin {
         isMingwX64 -> mingwX64("native")
         else -> throw GradleException("Host OS is not supported in Kotlin/Native.")
     }
-
     
     sourceSets {
         val commonMain by getting {
@@ -53,7 +52,11 @@ kotlin {
         }
 
         val jvmMain by getting
-        val jvmTest by getting
+        val jvmTest by getting {
+            dependencies {
+                implementation("io.kotest:kotest-runner-junit5:5.3.2")
+            }
+        }
         val jsMain by getting
         val jsTest by getting
         val nativeMain by getting
