@@ -66,7 +66,7 @@ interface LambdaAlg<F> {
             type: KType,
             raw: RawExpr,
             atomDeserializer: ExprDeserializer = ExprDeserializer.Empty,
-            typeResolver: (String) -> KType?
+            resolveType: (String) -> KType?
         ): A? {
             return when (raw) {
                 is RawExpr.App -> {
@@ -114,11 +114,24 @@ interface LambdaAlg<F> {
                 }
                 is RawExpr.AppOp -> {
                     println("AppOp")
-                    // TODO: Match on type of function,
-                    //  parse function and arguments,
-                    //  apply function to argument if
-                    //  both parse successfully
-                    null
+                    resolveType(raw.f.identifier)?.let { type ->
+                        type.patternMatchFunType(
+                            onMatch = object: FunMatcher<A?> {
+                                override fun <X : Any, Y : Any> match(
+                                    inClass: KClass<X>,
+                                    outClass: KClass<Y>,
+                                    inType: KType,
+                                    outType: KType
+                                ): A? {
+                                    // TODO: parse function and arguments,
+                                    //  apply function to argument if
+                                    //  both parse successfully
+                                    TODO("Not yet implemented")
+                                }
+                            },
+                            onMiss = null
+                        )
+                    }
                 }
                 is RawExpr.Const -> {
                     atomDeserializer.deserialize(type, raw, atomDeserializer)
