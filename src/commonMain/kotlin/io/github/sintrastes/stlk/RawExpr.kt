@@ -12,7 +12,7 @@ sealed class RawExpr {
 
     /** Representation of a lambda abstraction. */
     @Serializable
-    data class Lam(val label: String, val body: RawExpr): RawExpr()
+    data class Lam(val label: String, val body: RawExpr) : RawExpr()
 
     /**
      * [RawExpr] of a bound variable (from a lambda expression).
@@ -74,7 +74,7 @@ fun RawExpr.vars(): Set<String> {
             }
             is RawExpr.AppOp -> {
                 rec(expr.f, vars)
-                for(arg in expr.args) {
+                for (arg in expr.args) {
                     rec(arg, vars)
                 }
             }
@@ -82,9 +82,10 @@ fun RawExpr.vars(): Set<String> {
                 rec(expr.body, vars)
             }
             is RawExpr.Var -> vars.add(expr.label)
+
             // No vars to add in these cases.
-            is RawExpr.Const -> { }
-            is RawExpr.CustomOp -> { }
+            is RawExpr.Const -> {}
+            is RawExpr.CustomOp -> {}
         }
     }
 
