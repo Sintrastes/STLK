@@ -62,9 +62,14 @@ interface LambdaAlg<F> {
          * Assumption: [A] must be the same type as [type]. May cause strange issues otherwise
          *  due to type erasure.
          */
-        fun <A : Any> deserialize(type: KType, raw: RawExpr, rec: ExprDeserializer = ExprDeserializer.Empty): A? {
+        fun <A : Any> deserialize(
+            type: KType,
+            raw: RawExpr,
+            rec: ExprDeserializer = ExprDeserializer.Empty
+        ): A? {
             return when (raw) {
                 is RawExpr.App -> {
+                    println("App")
                     type.patternMatchFunType(
                         onMatch = object : FunMatcher<A?> {
                             override fun <X : Any, Y : Any> match(
@@ -73,6 +78,7 @@ interface LambdaAlg<F> {
                                 inType: KType,
                                 outType: KType
                             ): A? {
+                                println("Matches")
                                 return rec.deserialize<(X) -> Y>(type, raw.f, rec)?.let { f ->
                                     rec.deserialize<X>(inType, raw.x, rec)?.let { x ->
                                         f(x) as A
@@ -80,20 +86,27 @@ interface LambdaAlg<F> {
                                 }
                             }
                         },
-                        onMiss = null
+                        onMiss = run {
+                            println("Missed")
+                            null
+                        }
                     )
                 }
                 is RawExpr.Lam -> {
-                    rec.deserialize(type, raw.body, rec)
+                    println("Lam")
+                    deserialize(type, raw.body, rec)
                 }
                 is RawExpr.AppOp -> {
-                    rec.deserialize(type, raw, rec)
+                    println("AppOp")
+                    deserialize(type, raw, rec)
                 }
                 is RawExpr.Const -> {
                     rec.deserialize(type, raw, rec)
                 }
                 is RawExpr.Var -> {
-                    rec.deserialize(type, raw, rec)
+                    // Error: Unbound variable.
+                    println("Unbound variable")
+                    null
                 }
                 is RawExpr.CustomOp -> {
                     rec.deserialize(type, raw, rec)
