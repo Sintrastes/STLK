@@ -59,3 +59,37 @@ fun RawExpr.containsVar(label: String, notIn: List<String> = listOf()): Boolean 
         .containsVar(label, notIn + this.label)
     else -> false
 }
+
+/**
+ * Get a set of all of the variables used in an expression.
+ *
+ * Does not distinguish between free and bound variables.
+ */
+fun RawExpr.vars(): Set<String> {
+    fun rec(expr: RawExpr, vars: MutableSet<String>) {
+        when (expr) {
+            is RawExpr.App -> {
+                rec(expr.f, vars)
+                rec(expr.x, vars)
+            }
+            is RawExpr.AppOp -> {
+                rec(expr.f, vars)
+                for(arg in expr.args) {
+                    rec(arg, vars)
+                }
+            }
+            is RawExpr.Lam -> {
+                rec(expr.body, vars)
+            }
+            is RawExpr.Var -> vars.add(expr.label)
+            // No vars to add in these cases.
+            is RawExpr.Const -> { }
+            is RawExpr.CustomOp -> { }
+        }
+    }
+
+    val vars = mutableSetOf<String>()
+    rec(this, vars)
+
+    return vars
+}
