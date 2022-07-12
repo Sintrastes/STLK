@@ -65,7 +65,7 @@ interface LambdaAlg<F> {
         fun <A : Any> deserialize(
             type: KType,
             raw: RawExpr,
-            rec: ExprDeserializer = ExprDeserializer.Empty
+            atomDeserializer: ExprDeserializer = ExprDeserializer.Empty
         ): A? {
             return when (raw) {
                 is RawExpr.App -> {
@@ -79,8 +79,8 @@ interface LambdaAlg<F> {
                                 outType: KType
                             ): A? {
                                 println("Matches")
-                                return rec.deserialize<(X) -> Y>(type, raw.f, rec)?.let { f ->
-                                    rec.deserialize<X>(inType, raw.x, rec)?.let { x ->
+                                return atomDeserializer.deserialize<(X) -> Y>(type, raw.f, atomDeserializer)?.let { f ->
+                                    atomDeserializer.deserialize<X>(inType, raw.x, atomDeserializer)?.let { x ->
                                         f(x) as A
                                     }
                                 }
@@ -103,7 +103,7 @@ interface LambdaAlg<F> {
                                 outType: KType
                             ): A? {
                                 return { x: X ->
-                                    deserializeLambdaBody<Y, X>(type, raw.body, rec, raw.label, x)
+                                    deserializeLambdaBody<Y, X>(type, raw.body, atomDeserializer, raw.label, x)
                                         ?: throw IllegalArgumentException("Could not parse argument of type $type")
                                 } as A
                             }
@@ -120,7 +120,7 @@ interface LambdaAlg<F> {
                     null
                 }
                 is RawExpr.Const -> {
-                    rec.deserialize(type, raw, rec)
+                    atomDeserializer.deserialize(type, raw, atomDeserializer)
                 }
                 is RawExpr.Var -> {
                     // Error: Unbound variable.
@@ -128,7 +128,7 @@ interface LambdaAlg<F> {
                     null
                 }
                 is RawExpr.CustomOp -> {
-                    rec.deserialize(type, raw, rec)
+                    atomDeserializer.deserialize(type, raw, atomDeserializer)
                 }
             }
         }
