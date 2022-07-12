@@ -2,6 +2,8 @@ package io.github.sintrastes.stlk
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class LambdaAlgTest : FunSpec({
     test("Test integer arithmetic interpreter") {
@@ -16,7 +18,11 @@ class LambdaAlgTest : FunSpec({
         val raw = LambdaAlg.Serializer.lambdaExample()
             .fix()
 
+        println("Serialized: ${Json.encodeToString(raw)}")
+
         val example = LambdaAlg.deserialize<(Int) -> Int>(raw)!!
+
+        println("$example")
 
         example(2) shouldBe 2
     }
