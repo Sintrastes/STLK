@@ -94,7 +94,22 @@ interface LambdaAlg<F> {
                 }
                 is RawExpr.Lam -> {
                     println("Lam")
-                    deserialize(type, raw.body, rec)
+                    type.patternMatchFunType(
+                        onMatch = object : FunMatcher<A?> {
+                            override fun <X : Any, Y : Any> match(
+                                inClass: KClass<X>,
+                                outClass: KClass<Y>,
+                                inType: KType,
+                                outType: KType
+                            ): A? {
+                                return deserializeLambdaBody<Y, X>(type, raw.body, rec, raw.label)
+                                    ?.let { body ->
+                                        { x: X -> body(x) } as A
+                                    }
+                            }
+                        },
+                        onMiss = null
+                    )
                 }
                 is RawExpr.AppOp -> {
                     println("AppOp")
@@ -114,12 +129,12 @@ interface LambdaAlg<F> {
             }
         }
 
-        private fun <A : Any> deserializeLambda(
+        private fun <A : Any, X> deserializeLambdaBody(
             type: KType,
             raw: RawExpr,
             rec: ExprDeserializer = ExprDeserializer.Empty,
             varLabel: String
-        ): A? {
+        ): ((X) -> A)? {
             TODO()
         }
     }
