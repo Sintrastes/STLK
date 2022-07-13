@@ -55,21 +55,35 @@ interface IntArithAlg<F> : LambdaAlg<F> {
             raw: RawExpr,
             rec: ExprDeserializer
         ): A? {
-            return when (raw) {
-                is RawExpr.Const -> when (raw.value) {
+            return when {
+                raw is RawExpr.Const -> when (raw.value) {
                     is Int -> {
                         raw.value as? A
                     }
                     else -> null
                 }
-                is RawExpr.CustomOp -> when (raw.identifier) {
+                raw is RawExpr.CustomOp -> when (raw.identifier) {
                     "minus" -> ({ x: Int, y: Int -> x - y }) as? A
                     "plus" -> ({ x: Int, y: Int -> x + y }) as? A
                     "times" -> ({ x: Int, y: Int -> x * y }) as? A
                     else -> null
                 }
-                is RawExpr.AppOp -> {
-                    deserialize(type, raw.f, rec)
+                raw is RawExpr.AppOp && raw.args.size == 2 -> {
+                    val arg1 = raw.args[0]
+                    val arg2 = raw.args[1]
+
+                    when (raw.f.identifier) {
+                        "minus" -> {
+                            TODO()
+                        }
+                        "plus" -> {
+                            TODO()
+                        }
+                        "times" -> {
+                            TODO()
+                        }
+                        else -> null
+                    }
                 }
                 else -> null
             }
