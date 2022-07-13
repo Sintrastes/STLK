@@ -68,6 +68,9 @@ interface IntArithAlg<F> : LambdaAlg<F> {
                     "times" -> ({ x: Int, y: Int -> x * y }) as? A
                     else -> null
                 }
+                is RawExpr.AppOp -> {
+                    deserialize(type, raw.f, rec)
+                }
                 else -> null
             }
         }
