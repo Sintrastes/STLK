@@ -7,6 +7,8 @@ plugins {
 group = "io.github.sintrastes"
 version = "1.0-SNAPSHOT"
 
+val arrowVersion = "1.0.1"
+
 repositories {
     mavenCentral()
 }
@@ -42,6 +44,7 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
                 implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.10" )
+                implementation("io.arrow-kt:arrow-core:$arrowVersion")
             }
         }
         val commonTest by getting {
