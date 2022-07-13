@@ -13,8 +13,8 @@ fun <R> KType.patternMatchFunType(
 
     return if (isFun) {
         val args = this.arguments
-        val arg1 = this.arguments[0].type
-        val arg2 = this.arguments[1].type
+        val arg1 = args[0].type
+        val arg2 = args[1].type
 
         onMatch.match(
             arg1?.classifier as KClass<*>,
