@@ -1,7 +1,9 @@
 package io.github.sintrastes.stlk
 
 import io.github.sintrastes.stlk.typeutils.FunMatcher
+import io.github.sintrastes.stlk.typeutils.TypeVisitor
 import io.github.sintrastes.stlk.typeutils.patternMatchFunType
+import io.github.sintrastes.stlk.typeutils.visitType
 import kotlin.reflect.*
 
 /**
@@ -52,10 +54,10 @@ interface LambdaAlg<F> {
         inline fun <reified A : Any> deserialize(
             raw: RawExpr,
             atomDeserializer: ExprDeserializer = ExprDeserializer.Empty,
-            noinline resolveType: (String) -> KType?
+            noinline resolveType: (String) -> KType? = { null }
         ): A? {
             val type = typeOf<A>()
-            return deserialize(type, raw, atomDeserializer, resolveType)
+            return deserializeRoot(type, raw, atomDeserializer, resolveType)
         }
 
         /**
@@ -66,11 +68,11 @@ interface LambdaAlg<F> {
          * Assumption: [A] must be the same type as [type]. May cause strange issues otherwise
          *  due to type erasure.
          */
-        fun <A : Any> deserialize(
+        fun <A : Any> deserializeRoot(
             type: KType,
             raw: RawExpr,
             atomDeserializer: ExprDeserializer = ExprDeserializer.Empty,
-            resolveType: (String) -> KType?
+            resolveType: (String) -> KType? = { null }
         ): A? {
             return when (raw) {
                 is RawExpr.App -> {
@@ -125,24 +127,8 @@ interface LambdaAlg<F> {
                 }
                 is RawExpr.AppOp -> {
                     println("AppOp")
-                    resolveType(raw.f.identifier)?.let { type ->
-                        type.patternMatchFunType(
-                            onMatch = object : FunMatcher<A?> {
-                                override fun <X : Any, Y : Any> match(
-                                    inClass: KClass<X>,
-                                    outClass: KClass<Y>,
-                                    inType: KType,
-                                    outType: KType
-                                ): A? {
-                                    // TODO: parse function and arguments,
-                                    //  apply function to argument if
-                                    //  both parse successfully
-                                    TODO("Not yet implemented")
-                                }
-                            },
-                            onMiss = null
-                        )
-                    }
+                    atomDeserializer
+                        .deserialize(type, raw, RootDeserializer)
                 }
                 is RawExpr.Const -> {
                     atomDeserializer.deserialize(type, raw, atomDeserializer)
@@ -165,12 +151,18 @@ interface LambdaAlg<F> {
             resolveType: (String) -> KType?,
             varLabel: String,
             value: X
-        ): A? = deserialize(type, raw, atomDeserializer, resolveType)
+        ): A? = deserializeRoot(type, raw, atomDeserializer, resolveType)
             ?: when {
                 raw is RawExpr.Var && raw.label == varLabel ->
                     value as A
                 else -> null
             }
+    }
+
+    object RootDeserializer : ExprDeserializer {
+        override fun <A : Any> deserialize(type: KType, raw: RawExpr, rec: ExprDeserializer): A? {
+            return deserializeRoot(type, raw, rec)
+        }
     }
 }
 
