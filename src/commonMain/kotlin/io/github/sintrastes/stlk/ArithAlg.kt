@@ -1,5 +1,6 @@
 package io.github.sintrastes.stlk
 
+import arrow.core.computations.nullable
 import kotlin.reflect.*
 
 /** Object algebra for arithmetic operations on integers. */
@@ -68,22 +69,22 @@ interface IntArithAlg<F> : LambdaAlg<F> {
                     "times" -> ({ x: Int, y: Int -> x * y }) as? A
                     else -> null
                 }
-                raw is RawExpr.AppOp && raw.args.size == 2 -> {
-                    val arg1 = raw.args[0]
-                    val arg2 = raw.args[1]
+                raw is RawExpr.AppOp && raw.args.size == 2 -> nullable.eager {
+                    val arg1 = deserialize<Int>(typeOf<Int>(), raw.args[0], rec).bind()
+                    val arg2 = deserialize<Int>(typeOf<Int>(), raw.args[1], rec).bind()
 
                     when (raw.f.identifier) {
                         "minus" -> {
-                            TODO()
+                            arg1 - arg2
                         }
                         "plus" -> {
-                            TODO()
+                            arg1 + arg2
                         }
                         "times" -> {
-                            TODO()
+                            arg1 * arg2
                         }
                         else -> null
-                    }
+                    }  as? A
                 }
                 else -> null
             }
