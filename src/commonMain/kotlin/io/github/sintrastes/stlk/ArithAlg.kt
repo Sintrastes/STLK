@@ -74,15 +74,9 @@ interface IntArithAlg<F> : LambdaAlg<F> {
                     val arg2 = deserialize<Int>(typeOf<Int>(), raw.args[1], rec).bind()
 
                     when (raw.f.identifier) {
-                        "minus" -> {
-                            arg1 - arg2
-                        }
-                        "plus" -> {
-                            arg1 + arg2
-                        }
-                        "times" -> {
-                            arg1 * arg2
-                        }
+                        "minus" -> arg1 - arg2
+                        "plus" -> arg1 + arg2
+                        "times" -> arg1 * arg2
                         else -> null
                     }  as? A
                 }
