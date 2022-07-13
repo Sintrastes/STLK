@@ -26,6 +26,15 @@ fun <R> KType.patternMatchFunType(
     }
 }
 
+fun <R> KType.visitType(
+    typeVisitor: TypeVisitor<R>
+): R = typeVisitor
+    .visitType(this.classifier as KClass<*>)
+
+interface TypeVisitor<R> {
+    fun <T : Any> visitType(type: KClass<T>): R
+}
+
 interface FunMatcher<R> {
     fun <A : Any, B : Any> match(
         inClass: KClass<A>,
