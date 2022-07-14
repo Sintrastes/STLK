@@ -100,7 +100,7 @@ interface LambdaAlg<F> {
                     )
                 }
                 is RawExpr.Lam -> {
-                    println("Lam")
+                    println("Lam: $raw")
                     type.patternMatchFunType(
                         onMatch = object : FunMatcher<A?> {
                             override fun <X : Any, Y : Any> match(
@@ -126,11 +126,12 @@ interface LambdaAlg<F> {
                     )
                 }
                 is RawExpr.AppOp -> {
-                    println("AppOp")
+                    println("deserializeRoot AppOp: $raw")
                     atomDeserializer
-                        .deserialize(type, raw, RootDeserializer)
+                        .deserialize(type, raw, atomDeserializer) // RootDeserializer?
                 }
                 is RawExpr.Const -> {
+                    println("Const: $raw")
                     atomDeserializer.deserialize(type, raw, atomDeserializer)
                 }
                 is RawExpr.Var -> {
@@ -151,12 +152,31 @@ interface LambdaAlg<F> {
             resolveType: (String) -> KType?,
             varLabel: String,
             value: X
-        ): A? = deserializeRoot(type, raw, atomDeserializer, resolveType)
-            ?: when {
-                raw is RawExpr.Var && raw.label == varLabel ->
-                    value as A
-                else -> null
+        ): A? = run {
+            val deserializeWithVar = object : ExprDeserializer {
+                override fun <A : Any> deserialize(
+                    type: KType,
+                    raw: RawExpr,
+                    rec: ExprDeserializer
+                ): A? {
+                    return when {
+                        raw is RawExpr.Var && raw.label == varLabel ->
+                            value as A
+                        else -> null
+                    } ?: atomDeserializer.deserialize(type, raw, rec)
+                }
             }
+
+            deserializeRoot(type, raw, deserializeWithVar, resolveType)
+                ?: when {
+                    raw is RawExpr.Var && raw.label == varLabel ->
+                        value as A
+                    else -> {
+                        null
+                        // deserializeRoot(type, raw, deserializeWithVar, resolveType)
+                    }
+                }
+        }
     }
 
     object RootDeserializer : ExprDeserializer {

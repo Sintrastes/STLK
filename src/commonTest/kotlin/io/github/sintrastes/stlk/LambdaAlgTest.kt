@@ -50,6 +50,6 @@ fun <F> LambdaAlg<F>.lambdaExample(): Apply<F, (Int) -> Int> {
 
 fun <F> IntArithAlg<F>.example(): Apply<F, (Int) -> Int> {
     return func { x ->
-        x * int(5) + int(6)
+        int(5) * x + int(6)
     }
 }

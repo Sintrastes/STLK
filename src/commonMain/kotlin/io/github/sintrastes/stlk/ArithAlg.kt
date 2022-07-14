@@ -70,16 +70,27 @@ interface IntArithAlg<F> : LambdaAlg<F> {
                     else -> null
                 }
                 raw is RawExpr.AppOp && raw.args.size == 2 -> nullable.eager {
-                    val arg1 = deserialize<Int>(typeOf<Int>(), raw.args[0], rec).bind()
-                    val arg2 = deserialize<Int>(typeOf<Int>(), raw.args[1], rec).bind()
+                    println("ArithAlg AppOp: $raw")
+
+                    println("ArithAlg deserializing arg1: ${raw.args[0]} with $rec")
+                    val arg1 = rec.deserialize<Int>(typeOf<Int>(), raw.args[0], this@Deserializer).bind()
+                    println("ArithAlg deserialized arg1: $arg1")
+
+                    println("ArithAlg deserializing arg2: ${raw.args[1]} with $rec")
+                    val arg2 = rec.deserialize<Int>(typeOf<Int>(), raw.args[1], this@Deserializer).bind()
+                    println("ArithAlg deserialized arg2: $arg2")
 
                     when (raw.f.identifier) {
                         "minus" -> arg1 - arg2
                         "plus" -> arg1 + arg2
                         "times" -> arg1 * arg2
                         else -> null
-                    }  as? A
+                    } as? A
                 }
+                    ?: run {
+                        println("Failed ArithAlg AppOp")
+                        null
+                    }
                 else -> null
             }
         }
