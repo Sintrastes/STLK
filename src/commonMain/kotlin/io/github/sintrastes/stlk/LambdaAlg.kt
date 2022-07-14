@@ -165,6 +165,10 @@ interface LambdaAlg<F> {
                         else -> null
                     } ?: atomDeserializer.deserialize(type, raw, rec)
                 }
+
+                override fun toString(): String {
+                    return "deserializeWithVar($varLabel, $value)"
+                }
             }
 
             deserializeRoot(type, raw, deserializeWithVar, resolveType)
