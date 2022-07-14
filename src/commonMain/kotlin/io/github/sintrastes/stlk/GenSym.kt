@@ -2,6 +2,7 @@ package io.github.sintrastes.stlk
 
 /** Interface capable of generating unique symbols. */
 interface GenSym {
+    /** Generate a unique symbol with the given prefix. */
     fun genSym(prefix: String): String
 
     companion object {
