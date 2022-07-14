@@ -85,7 +85,7 @@ interface LambdaAlg<F> {
                                 inType: KType,
                                 outType: KType
                             ): A? {
-                                println("Matches")
+                                println("App Matches: $raw (($inType) -> $outType)")
                                 return atomDeserializer.deserialize<(X) -> Y>(type, raw.f, atomDeserializer)?.let { f ->
                                     atomDeserializer.deserialize<X>(inType, raw.x, atomDeserializer)?.let { x ->
                                         f(x) as A
@@ -94,7 +94,7 @@ interface LambdaAlg<F> {
                             }
                         },
                         onMiss = run {
-                            println("Missed")
+                            println("App Missed: $raw")
                             null
                         }
                     )
