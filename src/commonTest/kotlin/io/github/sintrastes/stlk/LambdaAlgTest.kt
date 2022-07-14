@@ -74,6 +74,22 @@ class LambdaAlgTest : FunSpec({
 
         example(2)(6) shouldBe 31
     }
+
+    test("Higher-order arithmetic deserializer test") {
+        val raw = IntArithAlg.Serializer.example4()
+            .fix()
+
+        println("Serialized: $raw")
+
+        val example = LambdaAlg.deserialize<((Int) -> Int) -> Int>(
+            raw,
+            IntArithAlg.Deserializer
+        )!!
+
+        println("$example")
+
+        example { it * it + 2 } shouldBe 42
+    }
 })
 
 fun <F> LambdaAlg<F>.lambdaExample(): Apply<F, (Int) -> Int> {
@@ -99,6 +115,12 @@ fun <F> IntArithAlg<F>.example3(): Apply<F, (Int) -> ((Int) -> Int)> {
         func { y ->
             y * (int(5) * x + y * x - int(15)) + int(2) - int(13)
         }
+    }
+}
+
+fun <F> IntArithAlg<F>.example4(): Apply<F, ((Int) -> Int) -> Int> {
+    return func { f ->
+        f(int(2)) - f(int(3))
     }
 }
 
