@@ -1,5 +1,6 @@
 package io.github.sintrastes.stlk
 
+import arrow.core.computations.nullable
 import io.github.sintrastes.stlk.typeutils.FunMatcher
 import io.github.sintrastes.stlk.typeutils.TypeVisitor
 import io.github.sintrastes.stlk.typeutils.patternMatchFunType
@@ -76,26 +77,25 @@ interface LambdaAlg<F> {
         ): A? {
             return when (raw) {
                 is RawExpr.App -> {
-                    println("App")
-                    type.patternMatchFunType(
-                        onMatch = object : FunMatcher<A?> {
-                            override fun <X : Any, Y : Any> match(
-                                inClass: KClass<X>,
-                                outClass: KClass<Y>,
-                                inType: KType,
-                                outType: KType
-                            ): A? {
-                                println("App Matches: $raw (($inType) -> $outType)")
-                                return atomDeserializer.deserialize<(X) -> Y>(type, raw.f, atomDeserializer)?.let { f ->
-                                    atomDeserializer.deserialize<X>(inType, raw.x, atomDeserializer)?.let { x ->
-                                        f(x) as A
-                                    }
-                                }
+                    println("App: $raw with $atomDeserializer")
+                    type.visitType(
+                        object: TypeVisitor<A?> {
+                            override fun <X : Any> visitType(
+                                clazz: KClass<X>
+                            ): A? = nullable.eager {
+                                println("Parsing x: ${raw.x}")
+                                val x = atomDeserializer.deserialize<X>(type, raw.x, atomDeserializer)
+                                    .bind()
+                                println("Parsed x: $x")
+
+                                println("Parsing f: ${raw.f}")
+                                val f = deserializeRoot<(X) -> A>(
+                                    type, raw.f, atomDeserializer, resolveType
+                                ).bind()
+                                println("Parsed f: $f")
+
+                                f(x)
                             }
-                        },
-                        onMiss = run {
-                            println("App Missed: $raw")
-                            null
                         }
                     )
                 }
