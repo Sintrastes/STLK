@@ -1,6 +1,8 @@
 package io.github.sintrastes.stlk
 
+import arrow.core.computations.nullable
 import kotlin.random.Random
+import kotlin.reflect.KType
 
 interface ListOpsAlg<F> {
     fun <A, B> Apply<F, List<A>>.map(f: (Apply<F, A>) -> Apply<F, B>): Apply<F, List<B>>
@@ -48,5 +50,22 @@ interface ListOpsAlg<F> {
                 )
             )
         )
+    }
+
+    object Deserializer : ExprDeserializer {
+        override fun <A : Any> deserialize(type: KType, raw: RawExpr, rec: ExprDeserializer): A? {
+            return when {
+                raw is RawExpr.CustomOp -> {
+                    TODO()
+                }
+                raw is RawExpr.AppOp && raw.args.size == 2 -> nullable.eager {
+                    TODO()
+                }
+                raw is RawExpr.AppOp && raw.args.size == 3 -> nullable.eager {
+                    TODO()
+                }
+                else -> null
+            }
+        }
     }
 }
