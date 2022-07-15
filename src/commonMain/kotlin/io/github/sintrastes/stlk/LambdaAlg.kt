@@ -135,7 +135,7 @@ interface LambdaAlg<F> {
                 }
                 is RawExpr.Var -> {
                     // Error: Unbound variable.
-                    println("Unbound variable")
+                    println("Unbound variable: ${raw.label}")
                     null
                 }
                 is RawExpr.CustomOp -> {
