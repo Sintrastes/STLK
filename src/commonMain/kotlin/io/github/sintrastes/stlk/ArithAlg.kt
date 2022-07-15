@@ -89,10 +89,6 @@ interface IntArithAlg<F> : LambdaAlg<F> {
                         else -> null
                     } as? A
                 }
-                    ?: run {
-                        println("Failed ArithAlg AppOp")
-                        null
-                    }
                 else -> null
             }
         }
