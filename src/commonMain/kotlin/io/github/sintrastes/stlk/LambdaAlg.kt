@@ -79,19 +79,18 @@ interface LambdaAlg<F> {
                 is RawExpr.App -> {
                     println("App: $raw with $atomDeserializer")
                     type.visitType(
-                        object: TypeVisitor<A?> {
+                        object : TypeVisitor<A?> {
                             override fun <X : Any> visitType(
                                 clazz: KClass<X>
                             ): A? = nullable.eager {
                                 println("Parsing x: ${raw.x}")
-                                val x = atomDeserializer.deserialize<X>(type, raw.x, atomDeserializer)
-                                    .bind()
+                                val x = (atomDeserializer.deserialize(type, raw.x, atomDeserializer)
+                                    ?: deserializeRoot<X>(type, raw.x, atomDeserializer)
+                                ).bind()
                                 println("Parsed x: $x")
 
                                 println("Parsing f: ${raw.f}")
-                                val f = deserializeRoot<(X) -> A>(
-                                    type, raw.f, atomDeserializer, resolveType
-                                ).bind()
+                                val f = deserializeRoot<(X) -> A>(type, raw.f, atomDeserializer, resolveType).bind()
                                 println("Parsed f: $f")
 
                                 f(x)

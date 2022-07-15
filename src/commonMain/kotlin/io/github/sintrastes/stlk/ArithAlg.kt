@@ -73,11 +73,13 @@ interface IntArithAlg<F> : LambdaAlg<F> {
                     println("ArithAlg AppOp: $raw")
 
                     println("ArithAlg deserializing arg1: ${raw.args[0]} with $rec")
-                    val arg1 = rec.deserialize<Int>(typeOf<Int>(), raw.args[0], rec).bind()
+                    val arg1 = (rec.deserialize<Int>(typeOf<Int>(), raw.args[0], rec)
+                        ?: LambdaAlg.deserializeRoot(typeOf<Int>(), raw.args[0], rec)).bind()
                     println("ArithAlg deserialized arg1: $arg1")
 
                     println("ArithAlg deserializing arg2: ${raw.args[1]} with $rec")
-                    val arg2 = rec.deserialize<Int>(typeOf<Int>(), raw.args[1], rec).bind()
+                    val arg2 = (rec.deserialize<Int>(typeOf<Int>(), raw.args[1], rec)
+                        ?: LambdaAlg.deserializeRoot(typeOf<Int>(), raw.args[1], rec)).bind()
                     println("ArithAlg deserialized arg2: $arg2")
 
                     when (raw.f.identifier) {
