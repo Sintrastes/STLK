@@ -3,6 +3,7 @@ package io.github.sintrastes.stlk
 import arrow.core.computations.nullable
 import kotlin.random.Random
 import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 interface ListOpsAlg<F> {
     fun <A, B> Apply<F, List<A>>.map(f: (Apply<F, A>) -> Apply<F, B>): Apply<F, List<B>>
@@ -55,13 +56,17 @@ interface ListOpsAlg<F> {
     object Deserializer : ExprDeserializer {
         override fun <A : Any> deserialize(type: KType, raw: RawExpr, rec: ExprDeserializer): A? {
             return when {
-                raw is RawExpr.CustomOp -> {
+                raw is RawExpr.AppOp && raw.args.size == 2 && raw.f.identifier == "map" -> nullable.eager {
+                    // TODO: Need to inspect type of list, and type of result in order to deduce the right types here
+                    val arg1 = (rec.deserialize<List<A>>(typeOf<List<A>>(), raw.args[0], rec)
+                        ?: LambdaAlg.deserializeRoot(typeOf<List<A>>(), raw.args[0], rec)).bind()
+
+                    val arg2 = (rec.deserialize<Boolean>(typeOf<Boolean>(), raw.args[1], rec)
+                        ?: LambdaAlg.deserializeRoot(typeOf<Boolean>(), raw.args[1], rec)).bind()
+
                     TODO()
                 }
-                raw is RawExpr.AppOp && raw.args.size == 2 -> nullable.eager {
-                    TODO()
-                }
-                raw is RawExpr.AppOp && raw.args.size == 3 -> nullable.eager {
+                raw is RawExpr.AppOp && raw.args.size == 3 && raw.f.identifier == "fold" -> nullable.eager {
                     TODO()
                 }
                 else -> null
