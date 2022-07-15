@@ -113,7 +113,20 @@ interface CondAlg<F> {
                     } as? A
                 }
                 raw is RawExpr.AppOp && raw.args.size == 3 && raw.f.identifier == "cond" -> nullable.eager {
-                    TODO()
+                    val arg1 = (rec.deserialize<Boolean>(typeOf<Boolean>(), raw.args[0], rec)
+                        ?: LambdaAlg.deserializeRoot(typeOf<Boolean>(), raw.args[0], rec)).bind()
+
+                    val arg2 = (rec.deserialize<A>(type, raw.args[1], rec)
+                        ?: LambdaAlg.deserializeRoot(type, raw.args[1], rec)).bind()
+
+                    val arg3 = (rec.deserialize<A>(type, raw.args[1], rec)
+                        ?: LambdaAlg.deserializeRoot(type, raw.args[1], rec)).bind()
+
+                    if (arg1) {
+                        arg2
+                    } else {
+                        arg3
+                    }
                 }
                 else -> null
             }
