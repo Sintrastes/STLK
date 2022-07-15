@@ -120,7 +120,7 @@ class LambdaAlgTest : FunSpec({
 
         println("$example")
 
-        example { it * it + 2 } shouldBe 42
+        example { it * it + 2 } shouldBe -5
     }
 })
 

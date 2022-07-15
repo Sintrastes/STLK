@@ -134,9 +134,11 @@ interface LambdaAlg<F> {
                     atomDeserializer.deserialize(type, raw, atomDeserializer)
                 }
                 is RawExpr.Var -> {
-                    // Error: Unbound variable.
-                    println("Unbound variable: ${raw.label} in $atomDeserializer")
-                    null
+                    atomDeserializer.deserialize(type, raw, atomDeserializer)
+                        ?: run {
+                            println("Unbound variable: ${raw.label} in $atomDeserializer")
+                            null
+                        }
                 }
                 is RawExpr.CustomOp -> {
                     atomDeserializer.deserialize(type, raw, atomDeserializer)
