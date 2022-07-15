@@ -135,7 +135,7 @@ interface LambdaAlg<F> {
                 }
                 is RawExpr.Var -> {
                     // Error: Unbound variable.
-                    println("Unbound variable: ${raw.label}")
+                    println("Unbound variable: ${raw.label} in $atomDeserializer")
                     null
                 }
                 is RawExpr.CustomOp -> {
@@ -166,7 +166,7 @@ interface LambdaAlg<F> {
                 }
 
                 override fun toString(): String {
-                    return "deserializeWithVar($varLabel, $value)"
+                    return "deserializeWithVar($varLabel, $value, $atomDeserializer)"
                 }
             }
 
