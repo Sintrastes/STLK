@@ -119,8 +119,8 @@ interface CondAlg<F> {
                     val arg2 = (rec.deserialize<A>(type, raw.args[1], rec)
                         ?: LambdaAlg.deserializeRoot(type, raw.args[1], rec)).bind()
 
-                    val arg3 = (rec.deserialize<A>(type, raw.args[1], rec)
-                        ?: LambdaAlg.deserializeRoot(type, raw.args[1], rec)).bind()
+                    val arg3 = (rec.deserialize<A>(type, raw.args[2], rec)
+                        ?: LambdaAlg.deserializeRoot(type, raw.args[2], rec)).bind()
 
                     if (arg1) {
                         arg2
