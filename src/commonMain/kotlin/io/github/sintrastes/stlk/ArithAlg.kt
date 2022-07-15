@@ -97,15 +97,4 @@ interface IntArithAlg<F> : LambdaAlg<F> {
             }
         }
     }
-
-    companion object {
-        val TypeResolver: (String) -> KType? = { ident ->
-            when (ident) {
-                "minus" -> typeOf<(Int, Int) -> Int>()
-                "plus"  -> typeOf<(Int, Int) -> Int>()
-                "times" -> typeOf<(Int, Int) -> Int>()
-                else -> null
-            }
-        }
-    }
 }

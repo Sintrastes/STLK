@@ -54,11 +54,10 @@ interface LambdaAlg<F> {
          * on top of this one. */
         inline fun <reified A : Any> deserialize(
             raw: RawExpr,
-            atomDeserializer: ExprDeserializer = ExprDeserializer.Empty,
-            noinline resolveType: (String) -> KType? = { null }
+            atomDeserializer: ExprDeserializer = ExprDeserializer.Empty
         ): A? {
             val type = typeOf<A>()
-            return deserializeRoot(type, raw, atomDeserializer, resolveType)
+            return deserializeRoot(type, raw, atomDeserializer)
         }
 
         /**
@@ -72,8 +71,7 @@ interface LambdaAlg<F> {
         fun <A : Any> deserializeRoot(
             type: KType,
             raw: RawExpr,
-            atomDeserializer: ExprDeserializer = ExprDeserializer.Empty,
-            resolveType: (String) -> KType? = { null }
+            atomDeserializer: ExprDeserializer = ExprDeserializer.Empty
         ): A? {
             return when (raw) {
                 is RawExpr.App -> {
@@ -90,7 +88,7 @@ interface LambdaAlg<F> {
                                 println("Parsed x: $x")
 
                                 println("Parsing f: ${raw.f}")
-                                val f = deserializeRoot<(X) -> A>(type, raw.f, atomDeserializer, resolveType).bind()
+                                val f = deserializeRoot<(X) -> A>(type, raw.f, atomDeserializer).bind()
                                 println("Parsed f: $f")
 
                                 f(x)
@@ -113,7 +111,6 @@ interface LambdaAlg<F> {
                                         type,
                                         raw.body,
                                         atomDeserializer,
-                                        resolveType,
                                         raw.label,
                                         x
                                     )
@@ -150,7 +147,6 @@ interface LambdaAlg<F> {
             type: KType,
             raw: RawExpr,
             atomDeserializer: ExprDeserializer = ExprDeserializer.Empty,
-            resolveType: (String) -> KType?,
             varLabel: String,
             value: X
         ): A? = run {
@@ -172,7 +168,7 @@ interface LambdaAlg<F> {
                 }
             }
 
-            deserializeRoot(type, raw, deserializeWithVar, resolveType)
+            deserializeRoot(type, raw, deserializeWithVar)
                 ?: when {
                     raw is RawExpr.Var && raw.label == varLabel ->
                         value as A
