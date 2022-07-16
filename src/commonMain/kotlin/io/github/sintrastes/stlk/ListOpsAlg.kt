@@ -1,7 +1,10 @@
 package io.github.sintrastes.stlk
 
 import arrow.core.computations.nullable
+import io.github.sintrastes.stlk.typeutils.ListMatcher
+import io.github.sintrastes.stlk.typeutils.patternMatchListType
 import kotlin.random.Random
+import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -56,16 +59,25 @@ interface ListOpsAlg<F> {
     object Deserializer : ExprDeserializer {
         override fun <A : Any> deserialize(type: KType, raw: RawExpr, rec: ExprDeserializer): A? {
             return when {
-                raw is RawExpr.AppOp && raw.args.size == 2 && raw.f.identifier == "map" -> nullable.eager {
-                    // TODO: Need to inspect type of list, and type of result in order to deduce the right types here
-                    val arg1 = (rec.deserialize<List<A>>(typeOf<List<A>>(), raw.args[0], rec)
-                        ?: LambdaAlg.deserializeRoot(typeOf<List<A>>(), raw.args[0], rec)).bind()
+                raw is RawExpr.AppOp && raw.args.size == 2 && raw.f.identifier == "map" ->
+                    type.patternMatchListType(
+                        onMatch = object : ListMatcher<A?> {
+                            override fun <T : Any> match(elementClass: KClass<T>, elementType: KType): A? =
+                                nullable.eager {
+                                    // TODO: Need to inspect type of either the first argument, or the
+                                    // function in order to determine the remaining type variables.
 
-                    val arg2 = (rec.deserialize<Boolean>(typeOf<Boolean>(), raw.args[1], rec)
-                        ?: LambdaAlg.deserializeRoot(typeOf<Boolean>(), raw.args[1], rec)).bind()
+                                    val arg1 = (rec.deserialize<List<A>>(typeOf<List<A>>(), raw.args[0], rec)
+                                        ?: LambdaAlg.deserializeRoot(typeOf<List<A>>(), raw.args[0], rec)).bind()
 
-                    TODO()
-                }
+                                    val arg2 = (rec.deserialize<Boolean>(typeOf<Boolean>(), raw.args[1], rec)
+                                        ?: LambdaAlg.deserializeRoot(typeOf<Boolean>(), raw.args[1], rec)).bind()
+
+                                    TODO()
+                                }
+                        },
+                        onMiss = null
+                    )
                 raw is RawExpr.AppOp && raw.args.size == 3 && raw.f.identifier == "fold" -> nullable.eager {
                     TODO()
                 }
