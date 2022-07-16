@@ -26,6 +26,28 @@ fun <R> KType.patternMatchFunType(
     }
 }
 
+/** Helper function to pattern match on the type of the passed `KType`
+ * against the pattern `List<A>`. */
+fun <R> KType.patternMatchListType(
+    onMatch: ListMatcher<R>,
+    onMiss: R
+): R {
+    val clazz = (this.classifier as? KClass<*>)
+    val isList = clazz!! == List::class
+
+    return if (isList) {
+        val args = this.arguments
+        val arg1 = args[0].type
+
+        onMatch.match(
+            arg1?.classifier as KClass<*>,
+            arg1
+        )
+    } else {
+        onMiss
+    }
+}
+
 fun <R> KType.visitType(
     typeVisitor: TypeVisitor<R>
 ): R = typeVisitor
@@ -41,5 +63,12 @@ interface FunMatcher<R> {
         outClass: KClass<B>,
         inType: KType,
         outType: KType
+    ): R
+}
+
+interface ListMatcher<R> {
+    fun <A : Any> match(
+        elementClass: KClass<A>,
+        elementType: KType,
     ): R
 }
